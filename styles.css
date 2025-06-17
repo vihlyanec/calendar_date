@@ -262,8 +262,23 @@ body {
 .day.holiday {
     background: linear-gradient(135deg, var(--error), #d32f2f);
     color: white;
-    cursor: default;
+    cursor: not-allowed;
     box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+    position: relative;
+}
+
+.day.holiday::after {
+    content: '🚫';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    font-size: 10px;
+}
+
+.day.holiday:hover {
+    background: linear-gradient(135deg, var(--error), #d32f2f);
+    transform: none;
+    cursor: not-allowed;
 }
 
 .day.selected {
