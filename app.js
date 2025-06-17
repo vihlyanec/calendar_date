@@ -11,7 +11,7 @@ tg.ready();
 // Конфигурация
 const CONFIG = {
     API_URLS: {
-        GET_VARIABLES: 'https://chatter.salebot.pro/api/da37e22b33eb13cc4cabaa04dfe21df9/get_variables',
+        GET_VARIABLES: 'https://chatter.salebot.pro/api/318b69f1db777329490d1c7dba584c26/get_variables',
         SAVE_DATES: 'https://chatter.salebot.pro/api/318b69f1db777329490d1c7dba584c26/callback'
     },
     MAX_DATES: 3,
