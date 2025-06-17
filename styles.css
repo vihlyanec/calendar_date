@@ -1,0 +1,379 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.header h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--tg-theme-text-color, #000000);
+}
+
+.status-info {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color, #999999);
+    padding: 8px;
+    background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+/* Календарь */
+.calendar-container {
+    background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.nav-btn {
+    background: var(--tg-theme-button-color, #0088cc);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn:hover {
+    opacity: 0.8;
+}
+
+.calendar-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.calendar-weekdays div {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--tg-theme-hint-color, #999999);
+    padding: 8px 4px;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.calendar-day:hover {
+    background: var(--tg-theme-button-color, #0088cc);
+    color: var(--tg-theme-button-text-color, #ffffff);
+}
+
+.calendar-day.other-month {
+    color: var(--tg-theme-hint-color, #cccccc);
+    cursor: default;
+}
+
+.calendar-day.other-month:hover {
+    background: transparent;
+    color: var(--tg-theme-hint-color, #cccccc);
+}
+
+.calendar-day.holiday {
+    background: #ff6b6b;
+    color: white;
+    cursor: default;
+}
+
+.calendar-day.holiday:hover {
+    background: #ff6b6b;
+}
+
+.calendar-day.selected {
+    background: var(--tg-theme-button-color, #0088cc);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    border-color: var(--tg-theme-button-color, #0088cc);
+}
+
+.calendar-day.saved {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.calendar-day.saved:hover {
+    background: #28a745;
+}
+
+.calendar-day.disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.calendar-day.disabled:hover {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+/* Сохраненные даты */
+.saved-dates {
+    background: var(--tg-theme-secondary-bg-color, #f8f9fa);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.saved-dates h3 {
+    margin-bottom: 12px;
+    font-size: 16px;
+    color: var(--tg-theme-text-color, #000000);
+}
+
+.dates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.date-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--tg-theme-bg-color, #ffffff);
+    border-radius: 8px;
+    border-left: 4px solid var(--tg-theme-button-color, #0088cc);
+}
+
+.date-info {
+    flex: 1;
+}
+
+.date-number {
+    font-weight: 600;
+    color: var(--tg-theme-text-color, #000000);
+}
+
+.event-name {
+    font-size: 14px;
+    color: var(--tg-theme-hint-color, #666666);
+    margin-top: 2px;
+}
+
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+/* Кнопка сохранения */
+.save-section {
+    text-align: center;
+}
+
+.save-btn {
+    background: var(--tg-theme-button-color, #0088cc);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+    opacity: 0.8;
+}
+
+.save-btn:disabled {
+    background: var(--tg-theme-hint-color, #cccccc);
+    cursor: not-allowed;
+}
+
+/* Попапы */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.popup-overlay.show {
+    display: flex;
+}
+
+.popup {
+    background: var(--tg-theme-bg-color, #ffffff);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 320px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--tg-theme-hint-color, #e9ecef);
+}
+
+.popup-header h3 {
+    font-size: 18px;
+    color: var(--tg-theme-text-color, #000000);
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--tg-theme-hint-color, #999999);
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    color: var(--tg-theme-text-color, #000000);
+}
+
+.popup-content {
+    padding: 16px;
+}
+
+.popup-content p {
+    margin-bottom: 16px;
+    color: var(--tg-theme-text-color, #000000);
+}
+
+.popup-content input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--tg-theme-hint-color, #ddd);
+    border-radius: 8px;
+    font-size: 16px;
+    margin-bottom: 16px;
+    background: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+}
+
+.popup-content input:focus {
+    outline: none;
+    border-color: var(--tg-theme-button-color, #0088cc);
+}
+
+.popup-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.cancel-btn, .add-btn, .ok-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.cancel-btn {
+    background: var(--tg-theme-hint-color, #6c757d);
+    color: white;
+}
+
+.add-btn {
+    background: var(--tg-theme-button-color, #0088cc);
+    color: var(--tg-theme-button-text-color, #ffffff);
+}
+
+.ok-btn {
+    background: var(--tg-theme-button-color, #0088cc);
+    color: var(--tg-theme-button-text-color, #ffffff);
+}
+
+.cancel-btn:hover, .add-btn:hover, .ok-btn:hover {
+    opacity: 0.8;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .container {
+        padding: 12px;
+    }
+    
+    .calendar-container {
+        padding: 12px;
+    }
+    
+    .calendar-day {
+        font-size: 12px;
+    }
+} 
