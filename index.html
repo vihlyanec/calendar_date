@@ -3,80 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Памятные даты</title>
+    <title>Цветочные напоминания</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Памятные даты</h1>
-            <div class="status-info" id="statusInfo"></div>
+    <div class="app">
+        <!-- Заголовок -->
+        <header class="header">
+            <div class="flower-decoration left">🌸</div>
+            <h1>Цветочные напоминания</h1>
+            <div class="flower-decoration right">🌺</div>
+        </header>
+
+        <!-- Информационная панель -->
+        <div class="info-panel" id="infoPanel">
+            <div class="info-content" id="infoContent"></div>
         </div>
 
-        <!-- Календарь -->
-        <div class="calendar-container">
-            <div class="calendar-header">
-                <button class="nav-btn" id="prevMonth">&lt;</button>
-                <h2 id="currentMonth">Январь 2025</h2>
-                <button class="nav-btn" id="nextMonth">&gt;</button>
-            </div>
-            
-            <div class="calendar-weekdays">
-                <div>Пн</div>
-                <div>Вт</div>
-                <div>Ср</div>
-                <div>Чт</div>
-                <div>Пт</div>
-                <div>Сб</div>
-                <div>Вс</div>
-            </div>
-            
-            <div class="calendar-days" id="calendarDays"></div>
-        </div>
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Календарь -->
+            <section class="calendar-section">
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <button class="nav-btn" id="prevMonth" aria-label="Предыдущий месяц">
+                            <span>‹</span>
+                        </button>
+                        <h2 id="currentMonth">Январь 2025</h2>
+                        <button class="nav-btn" id="nextMonth" aria-label="Следующий месяц">
+                            <span>›</span>
+                        </button>
+                    </div>
+                    
+                    <div class="calendar-body">
+                        <div class="weekdays">
+                            <div>Пн</div>
+                            <div>Вт</div>
+                            <div>Ср</div>
+                            <div>Чт</div>
+                            <div>Пт</div>
+                            <div>Сб</div>
+                            <div>Вс</div>
+                        </div>
+                        
+                        <div class="days" id="calendarDays"></div>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Список сохраненных дат -->
-        <div class="saved-dates" id="savedDates">
-            <h3>Сохраненные даты:</h3>
-            <div class="dates-list" id="datesList"></div>
-        </div>
+            <!-- Список сохраненных дат -->
+            <section class="saved-dates" id="savedDatesSection">
+                <div class="section-header">
+                    <span class="icon">💐</span>
+                    <h3>Мои цветочные даты</h3>
+                </div>
+                <div class="dates-list" id="datesList"></div>
+            </section>
 
-        <!-- Кнопка сохранения -->
-        <div class="save-section">
-            <button class="save-btn" id="saveBtn" disabled>Сохранить даты</button>
-        </div>
+            <!-- Кнопка сохранения -->
+            <section class="save-section">
+                <button class="save-btn" id="saveBtn" disabled>
+                    <span class="btn-icon">🌷</span>
+                    <span class="btn-text">Сохранить даты</span>
+                </button>
+            </section>
+        </main>
     </div>
 
-    <!-- Попап для добавления события -->
-    <div class="popup-overlay" id="eventPopup">
-        <div class="popup">
-            <div class="popup-header">
-                <h3>Добавить событие</h3>
-                <button class="close-btn" id="closePopup">&times;</button>
+    <!-- Модальные окна -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+
+    <!-- Попап добавления события -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Добавить напоминание</h3>
+                <button class="close-btn" id="closeEventModal" aria-label="Закрыть">
+                    <span>×</span>
+                </button>
             </div>
-            <div class="popup-content">
-                <p>Выбранная дата: <span id="selectedDateText"></span></p>
-                <input type="text" id="eventName" placeholder="Название события" maxlength="50">
-                <div class="popup-buttons">
-                    <button class="cancel-btn" id="cancelEvent">Отмена</button>
-                    <button class="add-btn" id="addEvent">Добавить</button>
+            <div class="modal-body">
+                <div class="selected-date-info">
+                    <span class="label">Выбранная дата:</span>
+                    <span class="date" id="selectedDateText"></span>
                 </div>
+                <div class="input-group">
+                    <label for="eventName">Название события</label>
+                    <input 
+                        type="text" 
+                        id="eventName" 
+                        placeholder="Например: День рождения мамы"
+                        maxlength="50"
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelEvent">Отмена</button>
+                <button class="btn btn-primary" id="addEvent">Добавить</button>
             </div>
         </div>
     </div>
 
     <!-- Попап уведомления -->
-    <div class="popup-overlay" id="notificationPopup">
-        <div class="popup">
-            <div class="popup-header">
+    <div class="modal" id="notificationModal">
+        <div class="modal-content">
+            <div class="modal-header">
                 <h3>Уведомление</h3>
-                <button class="close-btn" id="closeNotification">&times;</button>
+                <button class="close-btn" id="closeNotificationModal" aria-label="Закрыть">
+                    <span>×</span>
+                </button>
             </div>
-            <div class="popup-content">
+            <div class="modal-body">
                 <p id="notificationText"></p>
-                <div class="popup-buttons">
-                    <button class="ok-btn" id="okNotification">OK</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="okNotification">OK</button>
             </div>
         </div>
     </div>
