@@ -11,7 +11,7 @@ tg.ready();
 // Конфигурация
 const CONFIG = {
     API_URLS: {
-        GET_VARIABLES: 'https://chatter.salebot.pro/api/318b69f1db777329490d1c7dba584c26/get_variables',
+        GET_VARIABLES: 'https://chatter.salebot.pro/api/da37e22b33eb13cc4cabaa04dfe21df9/get_variables',
         SAVE_DATES: 'https://chatter.salebot.pro/api/318b69f1db777329490d1c7dba584c26/callback'
     },
     MAX_DATES: 3,
@@ -152,27 +152,39 @@ class FlowerRemindersApp {
         const data = await response.json();
         this.state.userVariables = data.variables || {};
         
-        // Парсим сохраненные даты
-        this.state.savedDates = [];
-        for (let i = 1; i <= CONFIG.MAX_DATES; i++) {
-            const eventKey = `sobitie_${i}`;
-            if (this.state.userVariables[eventKey]) {
-                try {
-                    const eventData = JSON.parse(this.state.userVariables[eventKey]);
-                    this.state.savedDates.push({
-                        date: eventData.date,
-                        name: eventData.name,
-                        index: i
-                    });
-                } catch (e) {
-                    console.warn(`Ошибка парсинга события ${i}:`, e);
+        // Проверяем, есть ли сохраненные даты (первый вход пользователя)
+        const hasSavedDates = Object.keys(this.state.userVariables).some(key => 
+            key.startsWith('sobitie_') && this.state.userVariables[key]
+        );
+        
+        if (!hasSavedDates) {
+            // Первый вход пользователя - сбрасываем состояние
+            this.state.savedDates = [];
+            this.state.lastSavedYear = null;
+            console.log('Первый вход пользователя - нет сохраненных дат');
+        } else {
+            // Парсим сохраненные даты
+            this.state.savedDates = [];
+            for (let i = 1; i <= CONFIG.MAX_DATES; i++) {
+                const eventKey = `sobitie_${i}`;
+                if (this.state.userVariables[eventKey]) {
+                    try {
+                        const eventData = JSON.parse(this.state.userVariables[eventKey]);
+                        this.state.savedDates.push({
+                            date: eventData.date,
+                            name: eventData.name,
+                            index: i
+                        });
+                    } catch (e) {
+                        console.warn(`Ошибка парсинга события ${i}:`, e);
+                    }
                 }
             }
-        }
 
-        // Получаем год последнего сохранения
-        if (this.state.userVariables.last_saved_year) {
-            this.state.lastSavedYear = parseInt(this.state.userVariables.last_saved_year);
+            // Получаем год последнего сохранения
+            if (this.state.userVariables.last_saved_year) {
+                this.state.lastSavedYear = parseInt(this.state.userVariables.last_saved_year);
+            }
         }
     }
 
@@ -191,10 +203,14 @@ class FlowerRemindersApp {
     updateInfoPanel() {
         const currentYear = new Date().getFullYear();
         const canModify = this.canModifyDates();
+        const isFirstEntry = this.state.savedDates.length === 0 && !this.state.lastSavedYear;
         
         let message, type;
         
-        if (!canModify) {
+        if (isFirstEntry) {
+            message = `Добро пожаловать! Выберите до ${CONFIG.MAX_DATES} памятных дат для напоминаний о цветах.`;
+            type = 'success';
+        } else if (!canModify) {
             message = `Внимание! Даты можно изменять только раз в год. Следующее изменение возможно в ${currentYear + 1} году.`;
             type = 'error';
         } else if (this.state.savedDates.length >= CONFIG.MAX_DATES) {
@@ -244,6 +260,8 @@ class FlowerRemindersApp {
                 const dateString = date.toISOString().split('T')[0];
                 if (CONFIG.HOLIDAYS_2025.includes(dateString)) {
                     dayElement.classList.add('holiday');
+                    // Праздники недоступны для выбора
+                    dayElement.classList.add('disabled');
                 } else {
                     // Проверяем, является ли сохраненной датой
                     const isSaved = this.state.savedDates.some(saved => {
@@ -314,6 +332,13 @@ class FlowerRemindersApp {
             return;
         }
         
+        // Дополнительная проверка на праздники
+        const dateString = date.toISOString().split('T')[0];
+        if (CONFIG.HOLIDAYS_2025.includes(dateString)) {
+            this.showNotification('Государственные праздники недоступны для выбора.', 'warning');
+            return;
+        }
+        
         // Проверяем ограничение на 15 дней
         const today = new Date();
         const daysDiff = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
@@ -323,13 +348,13 @@ class FlowerRemindersApp {
         }
         
         this.state.selectedDate = date;
-        const dateString = date.toLocaleDateString('ru-RU', {
+        const formattedDate = date.toLocaleDateString('ru-RU', {
             day: 'numeric',
             month: 'long',
             year: 'numeric'
         });
         
-        this.elements.selectedDateText.textContent = dateString;
+        this.elements.selectedDateText.textContent = formattedDate;
         this.elements.eventName.value = '';
         this.showModal('eventModal');
     }
