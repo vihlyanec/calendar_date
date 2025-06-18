@@ -59,14 +59,10 @@ async function initApp() {
     }
 }
 
-// Получение clientId из Telegram WebApp или из параметра id в URL
+// Получение clientId только из параметра id в URL (и дефолт для теста)
 function getClientId() {
-    let clientId = tg.initDataUnsafe?.user?.id || tg.initDataUnsafe?.query_id;
-    if (!clientId) {
-        const urlParams = new URLSearchParams(window.location.search);
-        clientId = urlParams.get('id');
-    }
-    return clientId;
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id') || '546082827'; // дефолтный id для теста
 }
 
 // Загрузка переменных пользователя из бота
@@ -74,18 +70,22 @@ async function loadUserVariables() {
     try {
         const clientId = getClientId();
         if (!clientId) {
-            throw new Error('Не удалось получить ID пользователя');
+            // Если id не найден, работаем с пустыми переменными
+            userVariables = {};
+            savedDates = [];
+            lastSavedYear = null;
+            return;
         }
-
         const response = await fetch(`https://chatter.salebot.pro/api/318b69f1db777329490d1c7dba584c26/get_variables?client_id=${clientId}`);
-        
         if (!response.ok) {
-            throw new Error('Ошибка получения данных от сервера');
+            // Если сервер не ответил, работаем с пустыми переменными
+            userVariables = {};
+            savedDates = [];
+            lastSavedYear = null;
+            return;
         }
-
         const data = await response.json();
         userVariables = data.variables || {};
-        
         // Парсим сохраненные даты
         savedDates = [];
         for (let i = 1; i <= 3; i++) {
@@ -103,15 +103,17 @@ async function loadUserVariables() {
                 }
             }
         }
-
         // Получаем год последнего сохранения
         if (userVariables.last_saved_year) {
             lastSavedYear = parseInt(userVariables.last_saved_year);
+        } else {
+            lastSavedYear = null;
         }
-
     } catch (error) {
         console.error('Ошибка загрузки переменных:', error);
-        throw error;
+        userVariables = {};
+        savedDates = [];
+        lastSavedYear = null;
     }
 }
 
