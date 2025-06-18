@@ -68,18 +68,17 @@ function getClientId() {
 // Загрузка переменных пользователя из бота
 async function loadUserVariables() {
     try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const clientId = +urlParams.get("id") || 546082827;
-
+        const clientId = getClientId();
         const response = await fetch(`https://chatter.salebot.pro/api/da37e22b33eb13cc4cabaa04dfe21df9/get_variables?client_id=${clientId}`);
 
         if (!response.ok) {
-            throw new Error('Сервер вернул ошибку');
+            userVariables = {};
+            savedDates = [];
+            lastSavedYear = null;
+            return;
         }
 
         const data = await response.json();
-        console.log('Переменные пользователя:', data);
-
         userVariables = data.variables || {};
         savedDates = [];
 
@@ -107,19 +106,6 @@ async function loadUserVariables() {
 
     } catch (err) {
         console.error('Ошибка загрузки переменных:', err);
-        userVariables = {};
-        savedDates = [];
-        lastSavedYear = null;
-    }
-}
-        // Получаем год последнего сохранения
-        if (userVariables.last_saved_year) {
-            lastSavedYear = parseInt(userVariables.last_saved_year);
-        } else {
-            lastSavedYear = null;
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки переменных:', error);
         userVariables = {};
         savedDates = [];
         lastSavedYear = null;
