@@ -77,7 +77,7 @@ async function loadUserVariables() {
             throw new Error('Не удалось получить ID пользователя');
         }
 
-        const response = await fetch(`https://chatter.salebot.pro/api/da37e22b33eb13cc4cabaa04dfe21df9/get_variables?client_id=${clientId}`);
+        const response = await fetch(`https://chatter.salebot.pro/api/318b69f1db777329490d1c7dba584c26/get_variables?client_id=${clientId}`);
         
         if (!response.ok) {
             throw new Error('Ошибка получения данных от сервера');
