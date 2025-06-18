@@ -136,40 +136,46 @@ class FlowerRemindersApp {
         }
     }
 
-    // Загрузка переменных пользователя
-    async loadUserVariables() {
-        const clientId = tg.initDataUnsafe?.user?.id || tg.initDataUnsafe?.query_id;
-        if (!clientId) {
-            throw new Error('Не удалось получить ID пользователя');
-        }
+    // Загрузка переменных пользователя из salebot.pro
+async loadUserVariables() {
+    const clientId = tg.initDataUnsafe?.user?.id || tg.initDataUnsafe?.query_id;
+    if (!clientId) {
+        throw new Error('Не удалось получить ID пользователя');
+    }
 
-        const response = await fetch(`${CONFIG.API_URLS.GET_VARIABLES}?client_id=${clientId}`);
-        
-        if (!response.ok) {
-            throw new Error('Ошибка получения данных от сервера');
-        }
+    const url = `${CONFIG.API_URLS.GET_VARIABLES}?client_id=${clientId}`;
+    const response = await fetch(url);
 
-        const data = await response.json();
-        this.state.userVariables = data.variables || {};
-        
-        // Парсим сохраненные даты
-        this.state.savedDates = [];
-        for (let i = 1; i <= CONFIG.MAX_DATES; i++) {
-            const eventKey = `sobitie_${i}`;
-            if (this.state.userVariables[eventKey]) {
-                try {
-                    const eventData = JSON.parse(this.state.userVariables[eventKey]);
-                    this.state.savedDates.push({
-                        date: eventData.date,
-                        name: eventData.name,
-                        index: i
-                    });
-                } catch (e) {
-                    console.warn(`Ошибка парсинга события ${i}:`, e);
-                }
+    if (!response.ok) {
+        throw new Error('Ошибка получения данных от salebot.pro');
+    }
+
+    const result = await response.json();
+    const vars = result?.variables || {};
+    this.state.userVariables = vars;
+
+    this.state.savedDates = [];
+
+    for (let i = 1; i <= CONFIG.MAX_DATES; i++) {
+        const key = `sobitie_${i}`;
+        if (vars[key]) {
+            try {
+                const parsed = JSON.parse(vars[key]);
+                this.state.savedDates.push({
+                    date: parsed.date,
+                    name: parsed.name,
+                    index: i
+                });
+            } catch (e) {
+                console.warn(`Ошибка при парсинге ${key}:`, e);
             }
         }
+    }
 
+    if (vars.last_saved_year) {
+        this.state.lastSavedYear = parseInt(vars.last_saved_year);
+    }
+}
         // Получаем год последнего сохранения
         if (this.state.userVariables.last_saved_year) {
             this.state.lastSavedYear = parseInt(this.state.userVariables.last_saved_year);
