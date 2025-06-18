@@ -155,67 +155,76 @@ function updateStatusInfo() {
     }
 }
 
-// Рендер календаря
 function renderCalendar() {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    // Обновляем заголовок
+    // Безопасная инициализация даты
+    const current = typeof currentDate !== 'undefined' ? currentDate : new Date();
+    const year = current.getFullYear();
+    const month = current.getMonth();
+
+    // Массив названий месяцев
     const monthNames = [
         'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
         'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
     ];
+
+    // Проверка наличия элементов в DOM
+    if (!elements?.currentMonth || !elements?.calendarDays) {
+        console.error('❌ Не найдены элементы currentMonth или calendarDays.');
+        return;
+    }
+
+    // Заголовок месяца
     elements.currentMonth.textContent = `${monthNames[month]} ${year}`;
-    
-    // Очищаем календарь
+
+    // Очищаем предыдущий календарь
     elements.calendarDays.innerHTML = '';
-    
-    // Получаем первый день месяца и количество дней
+
+    // Расчёт начальной и конечной даты
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
+
+    // Определяем, с какого дня начинать отображение (понедельник – начало недели)
     const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay() + (firstDay.getDay() === 0 ? -6 : 1));
-    
-    // Создаем дни календаря
+    const dayOfWeek = firstDay.getDay(); // 0 — воскресенье, 1 — понедельник и т.д.
+    const offset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    startDate.setDate(startDate.getDate() + offset);
+
+    // Рендерим 6 недель (42 дня)
     for (let i = 0; i < 42; i++) {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
-        
+
+        const dateString = date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+        const isCurrentMonth = date.getMonth() === month;
+
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day';
         dayElement.textContent = date.getDate();
-        
-        // Проверяем, является ли день текущего месяца
-        if (date.getMonth() !== month) {
+
+        if (!isCurrentMonth) {
             dayElement.classList.add('other-month');
+        } else if (Array.isArray(holidays2025) && holidays2025.includes(dateString)) {
+            dayElement.classList.add('holiday');
+        } else if (Array.isArray(savedDates) && savedDates.some(saved => {
+            const d = new Date(saved.date);
+            return d.getFullYear() === date.getFullYear()
+                && d.getMonth() === date.getMonth()
+                && d.getDate() === date.getDate();
+        })) {
+            dayElement.classList.add('saved');
+        } else if (typeof canSelectDate === 'function' && !canSelectDate(date)) {
+            dayElement.classList.add('disabled');
         } else {
-            // Проверяем, является ли праздником
-            const dateString = date.toISOString().split('T')[0];
-            if (holidays2025.includes(dateString)) {
-                dayElement.classList.add('holiday');
-            } else {
-                // Проверяем, является ли сохраненной датой
-                const isSaved = savedDates.some(saved => {
-                    const savedDate = new Date(saved.date);
-                    return savedDate.getDate() === date.getDate() && 
-                           savedDate.getMonth() === date.getMonth() && 
-                           savedDate.getFullYear() === date.getFullYear();
-                });
-                
-                if (isSaved) {
-                    dayElement.classList.add('saved');
+            dayElement.classList.add('selectable');
+            dayElement.addEventListener('click', () => {
+                if (typeof selectDate === 'function') {
+                    selectDate(date);
                 } else {
-                    // Проверяем, можно ли выбрать дату
-                    const canSelect = canSelectDate(date);
-                    if (!canSelect) {
-                        dayElement.classList.add('disabled');
-                    } else {
-                        dayElement.addEventListener('click', () => selectDate(date));
-                    }
+                    console.warn('⚠️ Функция selectDate не определена');
                 }
-            }
+            });
         }
-        
+
         elements.calendarDays.appendChild(dayElement);
     }
 }
