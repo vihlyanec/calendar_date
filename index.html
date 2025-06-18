@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Памятные даты</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Памятные даты</h1>
+            <div class="status-info" id="statusInfo"></div>
+        </div>
+
+        <!-- Календарь -->
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <button class="nav-btn" id="prevMonth">&lt;</button>
+                <h2 id="currentMonth">Январь 2025</h2>
+                <button class="nav-btn" id="nextMonth">&gt;</button>
+            </div>
+            
+            <div class="calendar-weekdays">
+                <div>Пн</div>
+                <div>Вт</div>
+                <div>Ср</div>
+                <div>Чт</div>
+                <div>Пт</div>
+                <div>Сб</div>
+                <div>Вс</div>
+            </div>
+            
+            <div class="calendar-days" id="calendarDays"></div>
+        </div>
+
+        <!-- Список сохраненных дат -->
+        <div class="saved-dates" id="savedDates">
+            <h3>Сохраненные даты:</h3>
+            <div class="dates-list" id="datesList"></div>
+        </div>
+
+        <!-- Кнопка сохранения -->
+        <div class="save-section">
+            <button class="save-btn" id="saveBtn" disabled>Сохранить даты</button>
+        </div>
+    </div>
+
+    <!-- Попап для добавления события -->
+    <div class="popup-overlay" id="eventPopup">
+        <div class="popup">
+            <div class="popup-header">
+                <h3>Добавить событие</h3>
+                <button class="close-btn" id="closePopup">&times;</button>
+            </div>
+            <div class="popup-content">
+                <p>Выбранная дата: <span id="selectedDateText"></span></p>
+                <input type="text" id="eventName" placeholder="Название события" maxlength="50">
+                <div class="popup-buttons">
+                    <button class="cancel-btn" id="cancelEvent">Отмена</button>
+                    <button class="add-btn" id="addEvent">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Попап уведомления -->
+    <div class="popup-overlay" id="notificationPopup">
+        <div class="popup">
+            <div class="popup-header">
+                <h3>Уведомление</h3>
+                <button class="close-btn" id="closeNotification">&times;</button>
+            </div>
+            <div class="popup-content">
+                <p id="notificationText"></p>
+                <div class="popup-buttons">
+                    <button class="ok-btn" id="okNotification">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 
