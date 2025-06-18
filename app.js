@@ -55,7 +55,6 @@ async function initApp() {
         setupEventListeners();
     } catch (error) {
         console.error('Ошибка инициализации:', error);
-        showNotification('Ошибка загрузки данных. Попробуйте еще раз.');
     }
 }
 
