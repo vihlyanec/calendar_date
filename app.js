@@ -68,41 +68,50 @@ function getClientId() {
 // Загрузка переменных пользователя из бота
 async function loadUserVariables() {
     try {
-        const clientId = getClientId();
-        if (!clientId) {
-            // Если id не найден, работаем с пустыми переменными
-            userVariables = {};
-            savedDates = [];
-            lastSavedYear = null;
-            return;
-        }
-        const response = await fetch(`https://chatter.salebot.pro/api/318b69f1db777329490d1c7dba584c26/get_variables?client_id=${clientId}`);
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = +urlParams.get("id") || 546082827;
+
+        const response = await fetch(`https://chatter.salebot.pro/api/da37e22b33eb13cc4cabaa04dfe21df9/get_variables?client_id=${clientId}`);
+
         if (!response.ok) {
-            // Если сервер не ответил, работаем с пустыми переменными
-            userVariables = {};
-            savedDates = [];
-            lastSavedYear = null;
-            return;
+            throw new Error('Сервер вернул ошибку');
         }
+
         const data = await response.json();
+        console.log('Переменные пользователя:', data);
+
         userVariables = data.variables || {};
-        // Парсим сохраненные даты
         savedDates = [];
+
         for (let i = 1; i <= 3; i++) {
-            const eventKey = `sobitie_${i}`;
-            if (userVariables[eventKey]) {
+            const key = `sobitie_${i}`;
+            if (userVariables[key]) {
                 try {
-                    const eventData = JSON.parse(userVariables[eventKey]);
+                    const parsed = JSON.parse(userVariables[key]);
                     savedDates.push({
-                        date: eventData.date,
-                        name: eventData.name,
+                        date: parsed.date,
+                        name: parsed.name,
                         index: i
                     });
-                } catch (e) {
-                    console.warn(`Ошибка парсинга события ${i}:`, e);
+                } catch (err) {
+                    console.warn(`Ошибка парсинга ${key}`, err);
                 }
             }
         }
+
+        if (userVariables.last_saved_year) {
+            lastSavedYear = parseInt(userVariables.last_saved_year);
+        } else {
+            lastSavedYear = null;
+        }
+
+    } catch (err) {
+        console.error('Ошибка загрузки переменных:', err);
+        userVariables = {};
+        savedDates = [];
+        lastSavedYear = null;
+    }
+}
         // Получаем год последнего сохранения
         if (userVariables.last_saved_year) {
             lastSavedYear = parseInt(userVariables.last_saved_year);
